@@ -54,7 +54,7 @@ int main() {
     * por lo que usleep puede tardar más, pero jamás menos del tiempo solicitado.
     */
     if (delta >= pausa_objetivo_us) {
-        std::cout << "[OK] Comportamiento del sistema dentro de los parámetros nominales." <<
+        std::cout << "[OK] Comportamiento del sistema dentro de los parámetros normales." <<
         std::endl;
     } else {
         std::cerr << "[ERROR] El reloj reportó menos tiempo del transcurrido físicamente." <<
