@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <unistd.h>
 #include "plataforma/reloj.h"
-#include "src/plataforma/relojLinux.cpp"
+#include "plataforma/relojLinux.h"
 
 /**
 * @brief Función principal de diagnóstico del sistema de tiempo.
@@ -21,7 +21,7 @@ int main() {
     /** @brief Instancia local de la implementación para linux. */
     Plataforma::RelojLinux reloj;
 
-    std::cout << "--- INICIANDO DIAGNÓSTICO DE PRECISIÓN TEMPORAL ---" < std::endl;
+    std::cout << "--- INICIANDO DIAGNÓSTICO DE PRECISIÓN TEMPORAL ---" << std::endl;
 
     /** 1. Verificación de la resolución reportada por el hardware. */
     uint64_t resolucion = reloj.obtener_resolucion_micro();
@@ -39,6 +39,14 @@ int main() {
 
     /** 3. Test de deriva y latencia del sistema operativo. */
     const uint32_t pausa_objetivo_us = 100000; // 100 milisegundos.
+
+    uint64_t inicio = reloj.obtener_ticks_micro();
+    usleep(pausa_objetivo_us);
+    uint64_t fin = reloj.obtener_ticks_micro();
+
+    uint64_t delta = fin - inicio;
+    double segundos = Plataforma::Reloj::ticks_a_segundos(delta);
+
     std::cout << "[RESULTADO] Tiempo real transcurrido: " << delta << "us(" << segundos <<
     " s" << std::endl;
 
@@ -51,7 +59,7 @@ int main() {
     } else {
         std::cerr << "[ERROR] El reloj reportó menos tiempo del transcurrido físicamente." <<
         std::endl;
-        return 1
+        return 1;
     }
-    return 0
+    return 0;
 }

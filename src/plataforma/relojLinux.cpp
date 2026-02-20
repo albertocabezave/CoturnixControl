@@ -5,23 +5,15 @@
 * desviaciones causadas por ajustes de hora del sistema (NTP).
 */
 
-#include "plataforma/reloj.h"
+#include "plataforma/relojLinux.h"
 #include <chrono>
 
 namespace Plataforma {
-    
-    /**
-    * @class RelojLinux
-    * @brief Implementación concreta que utiliza el reloj monotónico del sistema operativo.
-    */
-    class RelojLinux : public Reloj {
-        public:
-
         /**
         * @brief Captura el tiempo actual de CPU en microsegundos.
         * @return uint64_t Microsegundos transcurridos desde el arranque del reloj. 
         */
-        uint64_t obtener_ticks_micro() const noexcept override {
+        uint64_t RelojLinux::obtener_ticks_micro() const noexcept {
             auto ahora = std::chrono::steady_clock::now();
             return
         std::chrono::duration_cast<std::chrono::microseconds>(
@@ -33,9 +25,8 @@ namespace Plataforma {
         * @brief Devuelve la resolución del periodo del reloj steady de la librería estándar.
         * @return Resolución en microsegundos.
         */
-        uint64_t obtener_resolucion_micro() const noexcept override {
+        uint64_t RelojLinux::obtener_resolucion_micro() const noexcept {
             // En Linux moderno suele ser 1 nanosegundo, pero lo reportamos en micros.
             return 1;
         }
-    };
 } // namespace Plataforma
