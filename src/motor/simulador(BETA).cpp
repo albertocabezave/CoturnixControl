@@ -1,6 +1,8 @@
 /**
 * @file simulador.cpp
-* @brief Implementación del simulador con auto-gestión del acumulador. 
+* @brief Implementación de la logica de acumulación para la estabilidad del sistema.
+* * Separado de la cabecera para mantener la integridad del código y evitar
+* redeclaraciones durante el enlazado.
 */
 
 #include "motor/simulador.h"
@@ -12,8 +14,10 @@ namespace Motor {
     _tiempo_acumulado(0),
     _paso_fijo_us(1000000 / hz) {}
 
-    void Simulador::intentar_tick() {
-        if (_tiempo_acumulado >= _paso_fijo_us) {
+    bool Simulador::debe_actualizar(uint64_t dt_micro) {
+        _tiempo_acumulado += dt_micro;
+
+        if(_tiempo_acumulado >= _paso_fijo_us) {
             _tiempo_acumulado -= _paso_fijo_us;
             return true;
         }

@@ -1,9 +1,9 @@
 /**
 * @file simulador.h
-* @brief Motor de paso fijo para la sincronización del gemelo digital.
-* * Esta clase implementa el algoritmo de acumulación de tiempo para garantizar
-* que los sensores virtuales y la lógica del negocio se ejecuten en una sola
-* frecuencia constante, independientemente de la carga del CPU.
+* @brief Motor de paso fijo con gestión interna de estado.
+* * Esta versión automatiza el consumo de tiempo acumulado
+* eliminado la necesidad de manipular variables externas de
+* tiempo en el bucle principal.
 */
 
 #pragma once
@@ -12,34 +12,38 @@
 namespace Motor {
 
     /**
-    *@class Simulador
-    * @brief Controlador de tiempo determinista para la simulación.
+    * @class Simulador
+    * @brief Controlador de tiempo que gestiona su propio acumulador.
     */
     class Simulador {
         private:
-        Plataforma::Reloj& _reloj; /**< Referencia de hardware de tiempo. */
-        uint64_t _tiempo_acumulado; /**< Microsegundos pendientes de procesar. */
-        const uint64_t _paso_fijo_us; /**< Intervalo objetivo por tick.*/
+        Plataforma::Reloj& _reloj; /**< Referencia del hardware de tiempo. */
+        uint64_t _tiempo_acumulado; /**< Tiempo pendiente por procesar. */
+        const uint64_t _paso_fijo_us; /**< Duración constante del tick. */
 
         public:
         /**
-        * @brief Constructor del motor de simulación.
-        * @param r Referencia a la implementación del reloj.
-        * @param hz Frecuencia de actualización deseada (ej. 60 para 60Hz).
+        * @brief Inicializa el simulador con una frecuncia específica.
+        * @param r Referencia al reloj del sistema.
+        * @param hz Ticks por segundo.
         */
         Simulador(Plataforma::Reloj& r, uint32_t hz);
 
         /**
-        * @brief Verifica si el acumulador tiene suficiente tiempo para un tick físico.
-        * @param dt_micro Delta de tiempo real capturado desde el ultimo frame.
-        * @return true si debe ejecutar un paso de simulación, false en caso contrario.
-        * * Este método es la base de la integridad del sistema bajo estrés.
+        * @brief Alimenta el acumulador con el delta de tiempo real.
+        * @param dt_micro Tiempo transcurrio desde el ultimo frame.
         */
-        bool debe_actualizar(uint64_t dt_micro);
+        void actualizar_tiempo(uint64_t dt_micro);
 
         /**
-        * @brief Retorna el valor del paso fijo en segundos para cáclulos físicos.
-        * @return double Valor constante (ej. 0.01666 para 60Hz).
+        * @brief Intenta consumir un paso de simulación.
+        * @return true si se consumió un tick (resta un paso del acumulador).
+        * @return false si no hay suficiente tiempo acumulado.
+        */
+        bool intentar_tick();
+
+        /**
+        * @brief Retorna el valor del paso fijo en segundos.
         */
         double obtener_paso_segundos() const noexcept;
     };
